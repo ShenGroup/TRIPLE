@@ -1,0 +1,17 @@
+{
+    "bandit_choice": "SequentialHalving",
+    "T": 50,
+    "LLM_choice": "ChatGPT",
+    "method": "default",
+    "few_shot": false,
+    "num_examples": 2,
+    "reward_method_train": "f1",
+    "reward_method_eval": "f1",
+    "use_examples": false, 
+    "num_prompts_examples": 5, 
+    "num_examples_per_prompt": 2,
+    "use_rephrases": true, 
+    "num_prompts_rephrases": 10, 
+    "task": "informal_to_formal",
+    "num_eval_samples": 300
+}
