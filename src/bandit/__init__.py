@@ -7,3 +7,5 @@ from .baseline.top_k import TopK
 from .contextual.gse import GSE
 from .contextual.neural_ucb import NeuralUCB
 from .contextual.expected_improvement import ExpectedImprovement
+from .contextual.MES import MES
+from .contextual.probability_improvement import ProbabilityImprovement

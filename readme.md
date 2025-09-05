@@ -1,64 +1,66 @@
+# Efficient Prompt Optimization Through the Lens of Best Arm Identification (NeurIPS 2024)
 
-# Best Arm Identification for Prompt Learning under a Limited Budget
+This repository contains the official implementation of our NeurIPS 2024 paper, **"[Efficient Prompt Optimization Through the Lens of Best Arm Identification](https://arxiv.org/pdf/2402.09723)"**. We introduce **TRIPLE**, a principled and cost-effective framework for automatic prompt engineering.
 
-Welcome to TRIPLE's prompt learning world! ![procedure](procedure.png)
+---
 
-## Introduction
+## 🎯 Introduction
 
-Welcome to our repository! This repository contains the code and resources for our paper on "Best Arm Identification for Prompt Learning under a Limited Budget". In this paper, we explore the application of best arm identification algorithms in the prompt learning process for large language models.
+Optimizing prompts to elicit the best possible responses from Large Language Models (LLMs) is a critical but often expensive task. Traditional methods rely on extensive trial-and-error, best-of-n sampling, or human-in-the-loop tuning, all of which consume significant computational resources and API costs.
 
-![experimental_result](result.png)
+This project tackles the problem of **budget-limited prompt optimization**. We establish a novel connection between this challenge and the **Best Arm Identification (BAI)** problem from the Multi-Armed Bandit (MAB) literature. Our framework, **TRIPLE**, reframes prompt selection as a statistical process of identifying the single best "arm" (prompt) from a set of candidates within a fixed budget of LLM evaluations.
 
-## Code Overview
+This approach allows us to leverage powerful, theoretically-grounded BAI algorithms to create a more efficient and automated prompt selection pipeline.
 
-Our code is structured as follows:
+---
 
-- `collect_baseline.py`: Script for collecting baseline data.
-- `bandit_exp.py`: Script for running bandit experiments.
-- `src`: Source code directory.
-   - `bandit`: Directory for bandit algorithms.
-      - `baseline`: Directory for baseline algorithms.
-         - `TopK (Uniform)`: Implementation of the TopK (Uniform) algorithm.
-      - `contextual`: Directory for contextual bandit algorithms.
-         - `GSE`: Implementation of the GSE algorithm.
-      - `stochastic`: Directory for stochastic bandit algorithms.
-         - `UCB`: Implementation of the UCB algorithm.
-         - `SequentialHalving`: Implementation of the Sequential Halving algorithm.
-         - `ContinuousRejects`: Implementation of the Continuous Rejects algorithm.
-   - `LLM`: Directory for large language models.
-      - `ChatGPT`: Implementation of the ChatGPT model.
-      - `Whitebox`: Implementation of the Whitebox model.
-   - `utils`: Directory for utility functions.
-   - `constants.py`: File containing constants used in the code.
-   - `env.py`: File containing environment setup functions.
+## 🔎 The TRIPLE Framework
 
+The **TRIPLE** framework is built on a simple yet powerful analogy:
 
-### Environment Setup
-To set up the necessary environment, follow these steps:
+* **Arms**: Each candidate prompt in the search space is an "arm" of a multi-armed bandit.
+* **Arm Pulls**: Evaluating a prompt by sending it to an LLM and receiving a response is equivalent to "pulling" an arm.
+* **Reward**: The quality or performance score of the LLM's response serves as the "reward" for that arm pull.
+* **Budget**: The maximum number of allowed LLM evaluations is the fixed budget, $T$.
 
-1. Create a virtual python environment:
-   ```
-   git clone [Your Repo URL]
-   ```
-2. Install the required dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+The goal is to maximize the probability of identifying the best prompt (the arm with the highest mean reward) without exceeding the budget. We adapt and implement two state-of-the-art BAI algorithms for this task.
 
-### Additiopnal dependency
+---
 
+## ✨ Key Algorithms and Features
 
-To run the experiments, please make sure you have one of the following:
+This repository implements the core algorithms and extensions presented in our paper:
 
-1. OpenAI API Key: You will need your own OpenAI API key to access the language models. If you don't have one, you can sign up for an account and obtain the key from the OpenAI website.
+### Core BAI Algorithms
+* **TRIPLE-SH (Sequential Halving)**: This algorithm evenly divides the budget across rounds. In each round, it allocates budget to a set of surviving prompts and eliminates the worst-performing half, effectively focusing resources on the most promising candidates over time.
+* **TRIPLE-CR (Continuously Reject)**: A more adaptive elimination strategy. It continuously samples from the set of active prompts and uses a rejection criterion derived from the Large Deviation Principle to discard underperforming prompts as soon as there is sufficient statistical confidence.
 
-2. Whitebox Language Model: If you want to use the Whitebox language model, you will need to download it from the Hugging Face model hub. Instructions on how to download and set up the Whitebox model can be found on the [Hugging Face website](https://huggingface.co/).
+### Scalability Enhancements for Large Prompt Pools
+To handle scenarios with thousands of candidate prompts, we introduce two embedding-based enhancements that enable effective information sharing:
 
-Please ensure that you have these prerequisites before running the experiments.
+* **TRIPLE-CLST (Clustering)**: Before selection, prompts are converted to embeddings and clustered. The BAI algorithm then operates on these clusters, sharing evaluation information among semantically similar prompts to accelerate learning.
+* **TRIPLE-GSE (Gaussian Process with Squared Exponential Kernel)**: This approach models the relationship between prompt embeddings and their scores using a Gaussian Process. It uses a kernel function to capture similarities between prompts, allowing for more efficient and informed exploration of the vast prompt space.
 
+### Extension to Few-Shot Example Selection
+The TRIPLE framework is extended to tackle the complex combinatorial problem of selecting the optimal set of few-shot examples for in-context learning, framing it as a **Combinatorial MAB (CMAB)** problem.
+
+---
+
+## 📊 Experimental Results
+
+Our experiments demonstrate that TRIPLE significantly outperforms existing baselines in identifying high-performing prompts across various tasks while adhering to a strict budget.
+
+### Experimental results
+
+![Performance with 30 candidate prompts and 150 budget](./exp_results/P_30_N_150.png)
+
+![Performance with 150 candidate prompts and only 100 budget](./exp_results/P_150_N_100.png)
 
 
-## Running the Experiments
+
+---
+
+## 🚀 Getting Started
 
 To generate prompts, generate the embeddings and perform the clustering process, simply run
 
@@ -72,18 +74,20 @@ After collecting the prompts, run this script to compare different BAI algorithm
 bash main_exp.sh
 ```
 
-### Customization
+---
 
-You can customize the experiments by changing `config.json` or specify inputs in `main_exp.sh`
+If you find our work useful, please consider citing our paper:
+```
+@inproceedings{shi2024efficient,
+  title={Efficient Prompt Optimization Through the Lens of Best Arm Identification},
+  author={Shi, Chengshuai and Yang, Kun and Chen, Zihan and Li, Jundong and Yang, Jing and Shen, Cong},
+  booktitle={Thirty-eighth Conference on Neural Information Processing Systems},
+  year={2024},
+  url={[https://arxiv.org/abs/2402.09723](https://arxiv.org/abs/2402.09723)}
+}
+```
 
-## Results
-[TODO.]
-
-## Citing Our Work
-[TODO.]
-
-## Contact
-[TODO.]
+---
 
 ## Acknowledgements
 We have referenced the following repos for code development:
@@ -91,7 +95,3 @@ We have referenced the following repos for code development:
 [APE](https://github.com/keirp/automatic_prompt_engineer)
 [InstructZero](https://github.com/Lichang-Chen/InstructZero)
 [APO](https://github.com/microsoft/LMOps/tree/main/prompt_optimization)
-
-
-
-
